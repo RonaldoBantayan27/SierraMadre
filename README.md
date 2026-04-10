@@ -193,7 +193,15 @@ Churn in this dataset is primarily driven by customer satisfaction and engagemen
 **Notebook**    
 You can view the full analysis here:
 
-[Customer Churn Analysis](Customer_Churn_PredictionRB.ipynb)
+[Exploratory Data Analysis](01_EDA_Customer_Churn_Prediction.ipynb)
+[Logistic_Regression](02_Logistic_Regression_Customer_Churn_Prediction.ipynb)
+[Decision_Tree](03_Decision_Tree_Customer_Churn_Prediction.ipynb)
+[KNearest_Neighbors](04_KNearest_Neighbors_Customer_Churn_Prediction.ipynb)
+[Support_Vector](05_Support_Vector_Customer_Churn_Prediction.ipynb)
+[Random_Forest](06_Random_Forest_Customer_Churn_Prediction.ipynb)
+[Keras](07_Keras_Customer_Churn_Prediction.ipynb)
+[XGBoost](08_XGBoost_Customer_Churn_Prediction.ipynb)
+[Summary](09_Summary_Customer_Churn_Prediction.ipynb)
 
 **References:** 
 Ronaldo Bantayan (Author) Email: one01bant@yahoo.com     
