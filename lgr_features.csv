@@ -1,0 +1,9 @@
+feature,coefs
+csat_score,0.5429643859122217
+tenure_months,0.4940215207446752
+monthly_logins,0.4365241160590268
+payment_failures,0.383319056324272
+city_Toronto,0.17166489174780486
+country_UK,0.11136861399768395
+complaint_type_Service,0.10634547322325454
+signup_channel_Web,0.10628750634913185

@@ -1,0 +1,21 @@
+feature,importance
+csat_score,0.1711662
+tenure_months,0.1343189
+payment_failures,0.10492713
+monthly_logins,0.063196614
+tenure_fee_interaction,0.037034526
+survey_response,0.018550033
+country_USA,0.017082104
+gender_Male,0.016699223
+price_increase_last_3m_Yes,0.016674269
+monthly_fee,0.01638147
+contract_type,0.016149988
+country_Bangladesh,0.015048703
+email_open_rate,0.014894479
+complaint_type_Technical,0.0146044195
+signup_channel_Mobile,0.013955786
+signup_channel_Referral,0.013950404
+payment_method_Bank Transfer,0.0137571255
+age,0.012893272
+features_used,0.012757896
+city_Berlin,0.012740608
