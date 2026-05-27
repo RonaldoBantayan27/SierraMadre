@@ -68,24 +68,17 @@ The distributions of categorical columns are verified:
  `   value_count_column = df[i].value_counts(normalize=True)`  
  `   print(f'The value count for column {value_count_column} \n')`   
 
-Box plots of numerical features are analyzed prior to removal of outliers to visualize the presence of outliers.  
+Box plots of numerical features are analyzed to identify the strong predictors.  
 
-Outliers are removed from numeric features using the interquartile range (IQR) rule:  
-`for col in numeric_list:`  
-`    Q1 = df[col].quantile(0.25)`  
-`    Q3 = df[col].quantile(0.75)`  
-`    IQR = Q3 - Q1`  
-`    lower_bound = Q1 - 1.5*IQR`  
-`    upper_bound = Q3 + 1.5*IQR`  
-`    df = df[(df[col] >= lower_bound) & (df[col] <= upper_bound)]`  
-
-Box plots of numerical features are re-analyzed after the removal of outliers. The remaining outliers are allowed to stay to conserve data.   
+The outliers are allowed to stay to conserve data and more importantly, to preserve any churn signals.   
 
 For the box plots, particular attention is given to when the `‘churn’` median line is lower than the `‘no churn’` median line, churn is more likely here. Overlapping `‘churn’` and `‘no churn’` boxes indicate that the feature might not be a good predictor. Separation of the churn and no churn boxes is a strong signal for good predictors.  
 
 Stacked bars of categorical features (in percentages) are plotted.    The color ratios of the stacked bars highlight features which have slightly more churn.  
 
-Histograms are plotted to visualize the distribution of numerical features to help uncover trends and patterns.  
+Histograms are plotted to visualize the distribution of numerical features to help uncover trends and patterns and skewness.  
+
+'Churn' and 'no churn' histograms of features are plotted to observe churn behaviour in aid of feature engineering.
 
 Heat maps of numeric features are displayed to highlight significant positive and negative correlations especially with `‘churn’`.  
 
@@ -94,6 +87,8 @@ Heat maps of numeric features are displayed to highlight significant positive an
 Feature engineering is applied by creating a new feature (`tenure_fee_interaction`) which is a product of `tenure_months` and `monthly_fee`.  
 `df['tenure_fee_interaction'] = df['tenure_months'] * df['monthly_fee']`
 `df = df.drop(columns=['total_revenue'])`
+
+A total of 102 features is engineered.
 
 A pair plot analysis of the top six (6) numeric features is made to verify the distribution of churn in these numeric features.   
 
@@ -104,7 +99,7 @@ The features and target variable are defined:
 and then split into training and test sets:  
 `X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42, stratify=y)`  
 
-Scaling is not used in `DecisionTreeClassifier` while  `LogisticRegression`, `KNeighborsClassifier` and `SVC (Support Vector Classifier)` use scaling. `StandardScaler` is used. `KNeighborsClassifier` and `SVC (Support Vector Classifier)`are especially sensitive to the scale of input features.  
+Scaling is used in most of the models like `DecisionTreeClassifier`,  `LogisticRegression`, `KNeighborsClassifier` and `SVC (Support Vector Classifier)`. `StandardScaler` is used. `KNeighborsClassifier` and `SVC (Support Vector Classifier)`are especially sensitive to the scale of input features.  
 
 Categorial features are encoded using `OneHotEncoder` and `OrdinalEncoder`.
 
@@ -138,47 +133,26 @@ The `Precision-Recall Curve` is also plotted to demonstrate the relationship bet
 For each classifier, models are constructed and their respective performances are compared to each other. In addition to `Accuracy`, `Precision`, `Recall`, `F2 score`, and `AUC`, the best model is chosen based on business goals that consider the relative cost of missing a churner (`False Negatives` - predicted not to churn but churned, loss of lifetime value), cost of false alarms (`False Positives` - predicted to churn but stayed, cost of retention offer) and `True Positives` (predicted to stay and actually stayed, saved lifetime value less the cost of retention offer).  
 
 In this particular case of customer churn, missing churners (`Recall`) is more expensive than false alarms (`Precision`). `Recall` is, therefore, optimized at the expense of `Precision` and `Accuracy`.  
+
 The features and their proportional importances are also identified particularly those features whose increase or decrease correspondingly raise or lower the likelihood of customer churn.  
 
-Prediction is demonstrated using samples from the test data.  
-
-Identification of customers likely to churn is also shown.      
-
-A `Churn Risk Demonstration List` is taken from the test data to demonstrate one of the many ways to use the model. The list shows customers who have churned and those who have not. We need to pay close attention to those customers who have not churned yet and are at risk of churning.      
-For example, we shall identify customers with high churn probability (or showing signs of churning) and who have not yet churned so that we can embark on special and proactive programs to keep them from leaving.
+Prediction is demonstrated using samples from the test data.       
 
 Model hyperparameters are optimized using grid search to maximize model performance particularly addressing overfitting.
 
-Feature selection of encoded features reduces the number of features by around 40% to improve the model and to lessen noise. When there is less noise, the interpretability of feature importance improves. Noise in this context is irrelevant information that obscures underlying patterns or relationships the model is trying to learn.            
+Feature selection of encoded features reduces the number of features to improve the model and to lessen noise. When there is less noise, the interpretability of feature importance improves. Noise in this context is irrelevant information that obscures underlying patterns or relationships the model is trying to learn.            
 
 The features and their importances are identified particularly those features whose increase or decrease correspondingly raise or lower the likelihood of customer churn. The features and their importances are determined to verify the magnitude of features influence.      
 
-After feature selection, the results of feature importance from the top three (3) models are fed to a Generative AI (Gen AI) model for interpretation. The codes are commented because the API key can only be accessed locally. However, the Gen AI narrative is captured and shown.
-
+SHAP analysis further interprets the feature importance and is critical to feature engineering.
 
 **6.	Model Evaluation**
-   
-The GenAI model provided the following feature importance analysis on the results of the top three (3) classification models which are averaged.  There are slight changes between runs and they usually come from randomness in the pipeline but the ranking is generally maintained.
-
-"Based on the feature importance data, here are some key insights and observations: Top Important Features: 1. csat_score (0.884): The customer satisfaction score is the most important feature, indicating that customer satisfaction is a critical factor in predicting customer churn. This suggests that addressing customer concerns and improving overall customer experience can help retain customers. 2. tenure_months (0.882): Customer tenure is the second most important feature, indicating that longer-term customers are more likely to churn. This suggests that customers who have been with the company for a long time may be more at risk of leaving. 3. payment_failures (0.544): Payment failures are an important indicator of customer churn. This suggests that issues related to payment processing, billing, or financial difficulties can lead to customer dissatisfaction and churn. Features with Moderate Importance: 1. monthly_logins (0.480): Monthly logins indicate customer engagement, and a lack of engagement (i.e., infrequent logins) can be a sign of churn. This suggests that customers who are not actively using the service may be more likely to leave. 2. tenure_fee_interaction (0.312): The way tenure intersects with fee-related issues (e.g., pricing, pricing changes) seems to be somewhat significant, however, the exact relationship between these is unclear. Features with Lower Importance: 1. country_Bangladesh (0.129): The country of residence has a relatively low importance in predicting customer churn. This suggests that geographic location may not be a significant factor in determining customer loyalty. 2. escalations (0.126): Escalations (i.e., issues escalated to higher-level support) are not a significant predictor of customer churn. This suggests that while escalations may indicate quality issues, they are not a primary driver of churn. 3. email_open_rate (0.111): Customer engagement metrics (e.g., email open rates) are relatively low in importance, indicating that they may not be a significant predictor of customer churn. 4. city_Berlin (0.093): The city of residence also has a relatively low importance in predicting customer churn. 5. city_London (0.067): Like other geographic features, the city of London has a low importance in predicting customer churn. Takeaways: 1. Focus on customer satisfaction and experience: The high importance of csat_score suggests that improving customer satisfaction through better support, communication, and quality is critical. 2. Pay attention to payment and billing: Payment failures and issues related to payment processing can lead to churn, so addressing these issues is essential. 3. Monitor engagement metrics: While not as critical, monthly logins and email open rates can still indicate customer engagement or disengagement, which may be useful in early identification of potential churn. 4. Consider tenure-based insights: Analyze customer tenure to identify potential churn risks, and consider ways to retain long-term customers (e.g., loyalty programs, special offers). 5. Rethink geographic factors: The relatively low importance of geographic features (e.g., country, city) suggests that they may not be significant drivers of customer churn."
 
 **Overall Model Summary**     
 
-Based on the metrics of Accuracy, Precision, Recall, F2 Score, AUC and Profit/Loss, the `Decision Tree Classifier` is the winner. `Random Forest Classifier` and `XGBoost Classifier` are virtually tied for the second spot (see comparison table below). 
+Based on the metrics of AUC, Accuracy, Precision, Recall, F2 Score, and Profit/Loss, the XGBoost Classifier is the winner followed by Decision Tree Classifier and Random Forest Classifier.
 
-For this particular dataset, the `Decision Tree Classifier` is the recommended machine learning algorithm.
-
-| Model | Accuracy | Precision | Recall | F2 Score | AUC |Profit/Loss ($)|
-|:---------|:---------|:---------|:---------|:---------|:---------|:--------|
-| XGBoost | 0.7380 | 0.2659 | 0.9396 | 0.6124 | 0.840 | 43,620 |
-| Random Forest | 0.7393 | 0.2569 | 0.9396 | 0.6135 | 0.842 | 43,700 |
-| Decision Tree | 0.7469 | 0.2627 | 0.9396 | 0.6200 | 0.839 | 44,180 | 
-| Keras | 0.6108 | 0.1861 | 0.9329 | 0.5175 | 0.820 | 34,620 | 
-| Logistic Regression | 0.3042 | 0.1170 | 0.9799 | 0.3959 | 0.733 | 21,580 |
-| SVC | 0.4754 | 0.1452 | 0.9396 | 0.4487 | 0.782 | 26,940 |
-| K-Neighbors | 0.4641 | 0.1426 | 0.9396 | 0.4436 | 0.770 | 26,220 |
-
-The **feature importance** is consistent with what is highlighted in the **Heatmap of Significant Correlations** in the following order: `csat_score`, `tenure_months`, `payment_failures`, and `monthly_logins`.
+For this particular dataset, the XGBoost Classifier is the recommended machine learning algorithm.
 
 **Next Steps and Further Recommendations**  
 
@@ -192,16 +166,15 @@ Churn in this dataset is primarily driven by customer satisfaction and engagemen
 
 **Notebook**    
 You can view the full analysis here:
-
-[Exploratory Data Analysis](01_EDA_Customer_Churn_Prediction.ipynb)
-[Logistic_Regression](02_Logistic_Regression_Customer_Churn_Prediction.ipynb)
-[Decision_Tree](03_Decision_Tree_Customer_Churn_Prediction.ipynb)
-[KNearest_Neighbors](04_KNearest_Neighbors_Customer_Churn_Prediction.ipynb)
-[Support_Vector](05_Support_Vector_Customer_Churn_Prediction.ipynb)
-[Random_Forest](06_Random_Forest_Customer_Churn_Prediction.ipynb)
-[Keras](07_Keras_Customer_Churn_Prediction.ipynb)
-[XGBoost](08_XGBoost_Customer_Churn_Prediction.ipynb)
-[Summary](09_Summary_Customer_Churn_Prediction.ipynb)
+https://github.com/RonaldoBantayan27/SierraMadre/blob/main/01_EDA_Customer_Churn_Prediction.ipynb
+https://github.com/RonaldoBantayan27/SierraMadre/blob/main/02_LR_Customer_Churn_Prediction.ipynb
+https://github.com/RonaldoBantayan27/SierraMadre/blob/main/03_DT_Customer_Churn_Prediction.ipynb
+https://github.com/RonaldoBantayan27/SierraMadre/blob/main/04_KNN_Customer_Churn_Prediction.ipynb
+https://github.com/RonaldoBantayan27/SierraMadre/blob/main/05_SVC_Customer_Churn_Prediction.ipynb
+https://github.com/RonaldoBantayan27/SierraMadre/blob/main/06_RF_Customer_Churn_Prediction.ipynb
+https://github.com/RonaldoBantayan27/SierraMadre/blob/main/07_Keras_Customer_Churn_Prediction.ipynb
+https://github.com/RonaldoBantayan27/SierraMadre/blob/main/08_XGBoost_Customer_Churn_Prediction.ipynb
+https://github.com/RonaldoBantayan27/SierraMadre/blob/main/09_Summary_Customer_Churn_Prediction.ipynb
 
 **References:** 
 Ronaldo Bantayan (Author) Email: one01bant@yahoo.com     
