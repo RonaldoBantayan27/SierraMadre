@@ -82,13 +82,13 @@ Histograms are plotted to visualize the distribution of numerical features to he
 
 Heat maps of numeric features are displayed to highlight significant positive and negative correlations especially with `‘churn’`.  
 
-`total_revenue` is positively correlated with `tenure_months` (0.62) and `monthly_fee` (0.60) which is considered high. `total_revenue` does not add new predictive signal beyond `tenure_months` and `monthly_fee` since `total_revenue` is the product of `tenure_months` and `monthly_fee`. This means that `total_revenue` is mostly redundant and is, therefore, dropped. 
+`total_revenue` is positively correlated with `tenure_months` and `monthly_fee` which is considered high. `total_revenue` does not add new predictive signal beyond `tenure_months` and `monthly_fee` since `total_revenue` is the product of `tenure_months` and `monthly_fee`. This means that `total_revenue` is mostly redundant and is, therefore, dropped for Logistic Regression in order to reduce multicollinearity. 
 
 Feature engineering is applied by creating a new feature (`tenure_fee_interaction`) which is a product of `tenure_months` and `monthly_fee`.  
 `df['tenure_fee_interaction'] = df['tenure_months'] * df['monthly_fee']`
 `df = df.drop(columns=['total_revenue'])`
 
-A total of 102 features is engineered.
+A total of 102 features is engineered to uncover the patterns of churn behavior.
 
 A pair plot analysis of the top six (6) numeric features is made to verify the distribution of churn in these numeric features.   
 
@@ -111,30 +111,25 @@ Seven (7) supervised machine learning classification algorithms are used to buil
 The class imbalance is verified:  
 `val_count_churn = df['churn'].value_counts(normalize=True)`  
 `print(val_count_churn)`  
-`churn`  
-`0    0.906262`  
-`1    0.093738`  
-`Name: proportion, dtype: float64`  
+`churn`
+`0    0.8979`
+`1    0.1021`  
 
 In order to address the class imbalance, `SMOTE-NC (Synthetic Minority Oversampling Technique for Nominal and Continuous features)`is used by `KNeighborsClassifier` while the other models use the parameter `class_weight='balanced'`.  
 
 Transformers like `make_column_transformer` and `ColumnTransformer` are used to prepare the data for encoding and scaling, as required, and fed to a `Pipeline`.  
 
-A baseline model is built to benchmark the models to be designed. Simple models of the various algorithms are initially created to further benchmark the modeling effort.  
+Simple models of the various algorithms are initially created to further benchmark the modeling effort. The model parameters are then optimized using `HalvingRandomSearchCV`, `GridSearchCV`, and `RandomizedSearchCV`.   
 
-`classification_report` and `confusion_matrix` provide the `Accuracy`, `Precision`, and `Recall` of the models. `F2 score` is calculated and a `Profit/Loss analysis` is also made.   
-
-The models are optimized using `HalvingRandomSearchCV`, `GridSearchCV`, and `RandomizedSearchCV`.  
+`classification_report` and `confusion_matrix` provide the `Accuracy`, `Precision`, and `Recall` of the models. `F2 score` is calculated and a `Profit/Loss analysis` is also made.    
 
 The `ROC (Receiver Operating Characteristic) Curve` is plotted to display the  `AUC (Area Under Curve)` which is a measure of the predictive power of the model and to calculate the optimal threshold using the `Youden’s J` method.  
 
 The `Precision-Recall Curve` is also plotted to demonstrate the relationship between `Precision` and `Recall`. `Precision` and `Recall` are evaluated at different thresholds.  The threshold that maximizes profit is determined.  
 
-For each classifier, models are constructed and their respective performances are compared to each other. In addition to `Accuracy`, `Precision`, `Recall`, `F2 score`, and `AUC`, the best model is chosen based on business goals that consider the relative cost of missing a churner (`False Negatives` - predicted not to churn but churned, loss of lifetime value), cost of false alarms (`False Positives` - predicted to churn but stayed, cost of retention offer) and `True Positives` (predicted to stay and actually stayed, saved lifetime value less the cost of retention offer).  
+For each classifier, models are constructed and their respective performances are compared to each other in a separate notebook. In addition to `Accuracy`, `Precision`, `Recall`, `F2 score`, and `AUC`, the best model is chosen based on business goals that consider the relative cost of missing a churner (`False Negatives` - predicted not to churn but churned, loss of lifetime value), cost of false alarms (`False Positives` - predicted to churn but stayed, cost of retention offer) and `True Positives` (predicted to stay and actually stayed, saved lifetime value less the cost of retention offer).  
 
-In this particular case of customer churn, missing churners (`Recall`) is more expensive than false alarms (`Precision`). `Recall` is, therefore, optimized at the expense of `Precision` and `Accuracy`.  
-
-The features and their proportional importances are also identified particularly those features whose increase or decrease correspondingly raise or lower the likelihood of customer churn.  
+In this particular case of customer churn, missing churners (`Recall`) is more expensive than false alarms (`Precision`). `Recall` is, therefore, optimized at the expense of `Precision` and `Accuracy`. 
 
 Prediction is demonstrated using samples from the test data.       
 
@@ -144,7 +139,9 @@ Feature selection of encoded features reduces the number of features to improve 
 
 The features and their importances are identified particularly those features whose increase or decrease correspondingly raise or lower the likelihood of customer churn. The features and their importances are determined to verify the magnitude of features influence.      
 
-SHAP analysis further interprets the feature importance and is critical to feature engineering.
+SHAP analysis further interprets the feature importance and provides information critical to feature engineering.
+
+Samples predictions are demonstrated.
 
 **6.	Model Evaluation**
 
@@ -160,7 +157,7 @@ For this particular dataset, the XGBoost Classifier is the recommended machine l
 - Continue model development to include actual identification of clients who are likely to churn.
 - Tune the thresholds to maximize profit using realistic lifetime value and cost of retention assumptions.
 - Deploy and apply the model for the use of relevant business groups like marketing teams for retention campaigns, customer support teams for proactive outreach, and product teams for feature improvements. Leadership can also be guided by the model for churn strategy and forecasting.     
-- Continue model development to validate the features relative importance to guide management on which features need to be given particular attention in order to prevent churn.
+- Continue model development to validate the features relative importance to guide management on which features need to be given particular attention in order to prevent churn. It is critical to ensure the continuing relevance of the predictive features.
   
 Churn in this dataset is primarily driven by customer satisfaction and engagement levels rather than pricing. Improving user experience and increasing product adoption would likely have the strongest impact on reducing churn.
 
