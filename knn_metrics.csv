@@ -1,2 +1,2 @@
-K-Neighbors Classifier,AUC,Accuracy,Precision,Recall,F2 Score,Profit/Loss
-Model K4,0.77,0.4641057934508816,0.1425661914460285,0.9395973154362416,0.4435994930291508,26220
+Model,AUC,Accuracy,Precision,Recall,F2_Score,Profit_Loss
+KNeighbors,0.7605,0.636,0.1939,0.8137,0.4964,29760

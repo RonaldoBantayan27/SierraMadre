@@ -1,2 +1,2 @@
-Keras,AUC,Accuracy,Precision,Recall,F2 Score,Profit/Loss
-Model KE5,0.82,0.610831234256927,0.18607764390896922,0.9328859060402684,0.5174981384959046,34620
+Model,AUC,Accuracy,Precision,Recall,F2_Score,Profit_Loss
+Keras,0.7872,0.5965,0.1863,0.8775,0.5037,38560
